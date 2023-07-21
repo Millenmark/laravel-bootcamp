@@ -9,6 +9,21 @@ import { useForm, usePage } from "@inertiajs/react";
 dayjs.extend(relativeTime);
 
 const Chirp = ({ chirp }) => {
+    const { auth } = usePage().props;
+
+    const [editing, setEditing] = useState(false);
+
+    const { data, setData, patch, clearErrors, reset, errors } = useForm({
+        message: chirp.message,
+    });
+
+    const submit = (e) => {
+        e.preventDefault();
+        patch(route("chirps.update", chirp.id), {
+            onSuccess: () => setEditing(false),
+        });
+    };
+
     return (
         <div className="p-6 flex space-x-2">
             <svg
@@ -32,6 +47,12 @@ const Chirp = ({ chirp }) => {
                         <small className="ml-2 text-sm text-gray-600">
                             {dayjs(chirp.created_at).fromNow()}
                         </small>
+                        {chirp.created_at !== chirp.updated_at && (
+                            <small className="text-sm text-gray-600">
+                                {" "}
+                                &middot; edited
+                            </small>
+                        )}
                     </div>
                 </div>
                 <p className="mt-4 text-lg text-gray-900">{chirp.message}</p>
